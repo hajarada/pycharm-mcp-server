@@ -19,7 +19,7 @@ from pycharm_mcp.tools import (
 # Create the MCP server
 mcp = FastMCP(
     "PyCharm Refactoring",
-    description="Exposes PyCharm's refactoring capabilities for intelligent code transformations",
+    instructions="Exposes PyCharm's refactoring capabilities for intelligent code transformations",
 )
 
 
