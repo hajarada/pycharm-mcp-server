@@ -1,0 +1,43 @@
+<idea-plugin>
+    <id>com.github.pycharm.refactoring.bridge</id>
+    <name>PyCharm Refactoring Bridge</name>
+    <vendor email="hajarada@cisco.com" url="https://github.com/hajarada/pycharm-mcp-server">hajarada</vendor>
+
+    <description><![CDATA[
+    Exposes PyCharm's refactoring capabilities via an HTTP API for integration with external tools like Claude Code MCP.
+
+    <h2>Features</h2>
+    <ul>
+        <li>Rename symbols across the entire project</li>
+        <li>Move elements between modules</li>
+        <li>Extract methods and variables</li>
+        <li>Inline elements</li>
+        <li>Change function signatures</li>
+        <li>Safe delete with usage checking</li>
+        <li>Find usages</li>
+    </ul>
+
+    <h2>Usage</h2>
+    <p>The plugin starts an HTTP server on port 9876 (configurable) when PyCharm launches.
+    Use the companion MCP server to connect Claude Code to PyCharm's refactoring engine.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.python</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.pycharm.refactoring.settings.RefactoringBridgeConfigurable"
+                id="com.github.pycharm.refactoring.settings"
+                displayName="Refactoring Bridge"/>
+        <applicationService
+                serviceImplementation="com.github.pycharm.refactoring.settings.RefactoringBridgeSettings"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener
+                class="com.github.pycharm.refactoring.RefactoringBridgePlugin"
+                topic="com.intellij.ide.AppLifecycleListener"/>
+    </applicationListeners>
+</idea-plugin>
