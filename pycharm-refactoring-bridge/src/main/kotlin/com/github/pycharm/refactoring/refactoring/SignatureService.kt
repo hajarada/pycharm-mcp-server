@@ -166,8 +166,9 @@ class SignatureService {
     private fun buildSignatureString(function: PyFunction): String {
         return ApplicationManager.getApplication().runReadAction<String> {
             val params = function.parameterList.parameters.joinToString(", ") { param ->
-                val annotation = param.annotation?.text?.let { ": $it" } ?: ""
-                val default = (param as? com.jetbrains.python.psi.PyNamedParameter)?.defaultValue?.text?.let { " = $it" } ?: ""
+                val namedParam = param as? com.jetbrains.python.psi.PyNamedParameter
+                val annotation = namedParam?.annotation?.text?.let { ": $it" } ?: ""
+                val default = namedParam?.defaultValue?.text?.let { " = $it" } ?: ""
                 "${param.name}$annotation$default"
             }
             val returnType = function.annotation?.text?.let { " -> $it" } ?: ""

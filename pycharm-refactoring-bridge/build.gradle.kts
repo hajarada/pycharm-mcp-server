@@ -2,9 +2,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.22"
-    id("org.jetbrains.intellij") version "1.17.2"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
+    id("org.jetbrains.kotlin.jvm") version "1.9.25"
+    id("org.jetbrains.intellij.platform") version "2.2.1"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.25"
 }
 
 group = providers.gradleProperty("pluginGroup").get()
@@ -12,6 +12,9 @@ version = providers.gradleProperty("pluginVersion").get()
 
 repositories {
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 // Dependencies for Ktor HTTP server
@@ -25,22 +28,37 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+
+    intellijPlatform {
+        pycharmCommunity("2024.1")
+        bundledPlugin("PythonCore")
+    }
 }
 
-intellij {
-    pluginName.set(providers.gradleProperty("pluginName"))
-    version.set(providers.gradleProperty("platformVersion"))
-    type.set(providers.gradleProperty("platformType"))
+intellijPlatform {
+    pluginConfiguration {
+        name = providers.gradleProperty("pluginName")
+        version = providers.gradleProperty("pluginVersion")
+        ideaVersion {
+            sinceBuild = providers.gradleProperty("pluginSinceBuild")
+            untilBuild = providers.gradleProperty("pluginUntilBuild")
+        }
+    }
 
-    plugins.set(listOf(
-        "com.intellij.java",
-        "PythonCore"
-    ))
+    signing {
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+    }
+
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+    }
 }
 
 tasks {
     wrapper {
-        gradleVersion = "8.5"
+        gradleVersion = "8.11"
     }
 
     withType<JavaCompile> {
@@ -53,21 +71,5 @@ tasks {
             jvmTarget = "17"
             freeCompilerArgs = listOf("-Xjsr305=strict")
         }
-    }
-
-    patchPluginXml {
-        version.set(providers.gradleProperty("pluginVersion"))
-        sinceBuild.set(providers.gradleProperty("pluginSinceBuild"))
-        untilBuild.set(providers.gradleProperty("pluginUntilBuild"))
-    }
-
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
-    publishPlugin {
-        token.set(System.getenv("PUBLISH_TOKEN"))
     }
 }

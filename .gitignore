@@ -33,6 +33,7 @@ ENV/
 gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
+.intellijPlatform/
 
 # IntelliJ IDEA
 .idea/
